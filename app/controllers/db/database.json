@@ -1,0 +1,41 @@
+{
+    "usuarios": [
+        {
+            "id": 1,
+            "username": "admin",
+            "password": "admin",
+            "role": "admin",
+            "carrinho": []
+        },
+        {
+            "id": 2,
+            "username": "CONTATESTE",
+            "password": "SENHATESTE",
+            "role": "user",
+            "carrinho": []
+        },
+        {
+            "id": 3,
+            "username": "teste",
+            "password": "teste",
+            "role": "user",
+            "carrinho": []
+        }
+    ],
+    "produtos": [
+        {
+            "id": 1,
+            "nome": "teste",
+            "preco": 100.0,
+            "estoque": 1,
+            "imagem": "/static/img/produtos/20200125_155812969_iOS.jpg"
+        },
+        {
+            "id": 2,
+            "nome": "teste2",
+            "preco": 50.0,
+            "estoque": 1,
+            "imagem": "/static/img/produtos/20200520_122823161_iOS.jpg"
+        }
+    ]
+}
