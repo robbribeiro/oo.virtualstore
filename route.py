@@ -58,7 +58,10 @@ def login():
             session['user_id'] = user.id
             session['role'] = user.role
             flash('Login realizado com sucesso!', 'success')
-            return redirect(url_for('landing_page'))
+            if user.role == 'admin':
+                return redirect(url_for('admin_dashboard'))
+            else:
+                return redirect(url_for('landing_page'))"Redirecionar login admin para dashboard"        
         else:
             flash('Usuário ou senha incorretos!', 'error')
     
