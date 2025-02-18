@@ -61,7 +61,7 @@ def login():
             if user.role == 'admin':
                 return redirect(url_for('admin_dashboard'))
             else:
-                return redirect(url_for('landing_page'))"Redirecionar login admin para dashboard"        
+                return redirect(url_for('landing_page'))        
         else:
             flash('Usuário ou senha incorretos!', 'error')
     
