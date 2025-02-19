@@ -134,7 +134,6 @@ def edit_product_form(product_id):
     
     produto = next((p for p in db_manager.produtos if p.id == product_id), None)
     if not produto:
-        flash('Produto não encontrado!', 'error')
         return redirect(url_for('admin_dashboard'))
     
     return render_template('/admin/edit_product.html', produto=produto)
@@ -147,7 +146,6 @@ def edit_product(product_id):
     
     produto = next((p for p in db_manager.produtos if p.id == product_id), None)
     if not produto:
-        flash('Produto não encontrado!', 'error')
         return redirect(url_for('admin_dashboard'))
     
     # Atualizar dados básicos
@@ -171,11 +169,8 @@ def edit_product(product_id):
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
             produto.imagem = f"/static/img/produtos/{filename}"
-            print(f"[DEBUG] Salvando imagem em: {file_path}")
     
     db_manager.salvar_dados()
-    print(f"[DEBUG] Produto atualizado:{produto.nome} (ID: {produto.id}) {file_path}")
-    flash('Produto atualizado com sucesso!', 'success')
     return redirect(url_for('admin_dashboard'))
 
 
