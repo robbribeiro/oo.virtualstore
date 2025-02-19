@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Produto</title>
+    <link rel="stylesheet" href="/static/css/edit_product.css">
+    <script src="../../../static/js/admin/edit_product.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-container">
+        <div class="card">
+            <h2>Editar Produto</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="text" name="nome" placeholder="Nome do Produto" value="{{ produto.nome }}" required>
+                <input type="number" name="preco" step="0.01" placeholder="Preço" value="{{ produto.preco }}" required>
+                <input type="number" name="estoque" placeholder="Estoque" value="{{ produto.estoque }}" required>
+                <div class="file-upload-container">
+                    <div class="image-preview">
+                        <img id="current-img" src="{{ produto.imagem }}" alt="Imagem Atual">
+                        <img id="preview-img" src="" alt="Preview da Imagem" hidden>
+                    </div>
+                    <div class="file-upload">
+                        <label for="file-input" class="custom-file-upload">Escolher arquivo</label>
+                        <input id="file-input" type="file" name="imagem" accept="image/*" required hidden>
+                        <span id="file-chosen">Nenhum arquivo foi selecionado</span>
+                    </div>
+                </div>
+                <button type="submit">Salvar Alterações</button>
+                <a href="/admin/dashboard" class="btn-cancel">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

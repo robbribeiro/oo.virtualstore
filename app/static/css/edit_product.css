@@ -1,0 +1,116 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #414852;
+}
+
+.admin-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+}
+
+.card h2 {
+    text-align: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: #000;
+    margin-bottom: 1rem;
+}
+
+.card {
+    background: #414852;
+    border-radius: 15px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5); 
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #ddd;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.card form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.card input, .card button, .btn-cancel {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+}
+.card input {
+    background: #333;
+    color: #ddd;
+}
+.card button, .btn-cancel {
+    background-color: aqua;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.card button:hover, .btn-cancel:hover {
+    background-color: orangered;
+    color: #fff;
+}
+
+.btn-cancel {
+    text-decoration: none;
+    text-align: center;
+}
+
+.file-upload {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.custom-file-upload {
+    background-color: aqua;
+    color: #333;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-align: center;
+}
+
+.custom-file-upload:hover {
+    background-color: orangered;
+    color: white;
+}
+
+#file-chosen {
+    font-size: 14px;
+    color: #948d8d;
+    font-family: 'Montserrat', sans-serif;
+}
+
+
+input[type="file"] {
+    display: none;
+}
+
+.file-upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.image-preview {
+    margin-top: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 10px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+}

@@ -58,17 +58,26 @@ class DataManager:
         with open(self.db_path, 'w') as f:
             json.dump(data, f, indent=4)
             
-    def remover_produto(self, produto_id):
-        produto = next((p for p in self.produtos if p.id == produto_id), None)
+    def remover_produto(self, product_id):
+        produto = next((p for p in self.produtos if p.id == product_id), None)
+    
         if produto:
-            # Excluir a imagem associada
+            print(f"[DEBUG] Produto encontrado: {produto.nome} (ID: {produto.id})")
+        
+            # Remover imagem
             if produto.imagem:
-                caminho_absoluto = os.path.join('app', produto.imagem.lstrip('/'))
-                if os.path.exists(caminho_absoluto):
-                    os.remove(caminho_absoluto)
+                caminho_imagem = os.path.join('app', produto.imagem.lstrip('/'))
+                print(f"[DEBUG] Caminho da imagem: {caminho_imagem}")
+                if os.path.exists(caminho_imagem):
+                    os.remove(caminho_imagem)
+                    print("[DEBUG] Imagem excluída com sucesso.")
+        
             # Remover do banco de dados
-        self.produtos = [p for p in self.produtos if p.id != produto_id]
-        self.salvar_dados()
+            self.produtos = [p for p in self.produtos if p.id != product_id]
+            self.salvar_dados()
+            print("[DEBUG] Produto removido e banco de dados salvo.")
+        else:
+            print(f"[ERRO] Produto com ID {product_id} não encontrado.")
 
     # Métodos para manipulação de dados:
     def adicionar_usuario(self, usuario):

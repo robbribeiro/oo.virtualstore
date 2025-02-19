@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Admin</title>
+    <link rel="stylesheet" href="../../static/css/admin.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="../../../static/js/admin/dashboard.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-container">
+        <h1>Painel de Controle</h1>        
+        <!-- Formulário para Adicionar Produto -->
+        <div class="card">
+            <h2>Adicionar Novo Produto</h2>
+            <form id="addProductForm" enctype="multipart/form-data">
+                <input type="text" name="nome" placeholder="Nome" required>
+                <input type="number" name="preco" step="0.01" placeholder="Preço" required>
+                <input type="number" name="estoque" placeholder="Estoque" required>
+                <div id="image-preview" class="image-preview">
+                    <img id="preview-img" src="" alt="Preview da imagem" hidden>
+                </div>
+                <div class="file-upload">
+                    <label for="file-input" class="custom-file-upload">Escolher arquivo</label>
+                    <input id="file-input" type="file" name="imagem" accept="image/*" required hidden>
+                    <span id="file-chosen">Nenhum arquivo foi selecionado</span>
+                </div>
+                <button type="submit">Adicionar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Produtos (Atualização em Tempo Real via WebSocket) -->
+    <div class="wrapper">
+        {% for produto in produtos %}
+        <div class="single-card">
+            <div class="img-area">
+                <img src="{{produto.imagem}}" alt="{{produto.nome}}">
+                <div class="overlay">
+                    <a href="/admin/edit/{{ produto.id }}" class="btn-edit">Editar</a>
+                    <button class="btn-delete", onclick='deleteProduct({{produto.id}})'>Excluir</button>
+                </div>
+            </div>
+            <div class="info">
+                <h3>{{ produto.nome }}</h3>
+                <p class="price">R${{ produto.preco }}</p>
+                <p class="stock">Estoque: {{ produto.estoque }}</p>
+            </div>
+        </div>
+        {% endfor %} 
+    
+</body>
+</html>

@@ -16,8 +16,6 @@ ctl = Application()
 # Inicializa o SocketIO com o app Flask
 socketio = SocketIO(app)
 
-
-
 #Configurações para upload de imagem do produto
 diretorio_upload = 'app/static/img/produtos'
 os.makedirs(diretorio_upload, exist_ok=True)
@@ -95,7 +93,7 @@ def admin_dashboard():
         return redirect(url_for('landing_page'))
     
     produtos = db_manager.produtos
-    return render_template('dashboard.html', produtos=produtos)
+    return render_template('/admin/dashboard.html', produtos=produtos)
 
 @app.route('/admin/add_product', methods=['POST'])
 def add_product():
@@ -128,6 +126,70 @@ def add_product():
     
     return {'success': True}
 
+# Rota para editar produto (formulário)
+@app.route('/admin/edit/<int:product_id>')
+def edit_product_form(product_id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    
+    produto = next((p for p in db_manager.produtos if p.id == product_id), None)
+    if not produto:
+        flash('Produto não encontrado!', 'error')
+        return redirect(url_for('admin_dashboard'))
+    
+    return render_template('/admin/edit_product.html', produto=produto)
+
+# Rota para processar a edição do produto
+@app.route('/admin/edit/<int:product_id>', methods=['POST'])
+def edit_product(product_id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    
+    produto = next((p for p in db_manager.produtos if p.id == product_id), None)
+    if not produto:
+        flash('Produto não encontrado!', 'error')
+        return redirect(url_for('admin_dashboard'))
+    
+    # Atualizar dados básicos
+    produto.nome = request.form['nome']
+    produto.preco = float(request.form['preco'])
+    produto.estoque = int(request.form['estoque'])
+    
+    # Atualizar imagem se uma nova for enviada
+    if 'imagem' in request.files:
+        file = request.files['imagem']
+        print(f"[DEBUG] Novo arquivo de imagem recebido: {file.filename}")
+        if file.filename != '' and allowed_file(file.filename):
+            # Remove a imagem antiga
+            if produto.imagem:
+                old_image_path = os.path.join('app', produto.imagem.lstrip('/'))
+                if os.path.exists(old_image_path):
+                    os.remove(old_image_path)
+            
+            # Salva a nova imagem
+            filename = file.filename
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            produto.imagem = f"/static/img/produtos/{filename}"
+            print(f"[DEBUG] Salvando imagem em: {file_path}")
+    
+    db_manager.salvar_dados()
+    print(f"[DEBUG] Produto atualizado:{produto.nome} (ID: {produto.id}) {file_path}")
+    flash('Produto atualizado com sucesso!', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+
+#Rota para remoção de produto
+@app.route('/admin/delete_product/<int:product_id>', methods=['POST'])
+def delete_product(product_id):
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    
+    # Debug: Log do ID recebido
+    print(f"[DEBUG] Tentando excluir produto ID: {product_id}")
+    
+    db_manager.remover_produto(product_id)
+    return redirect(url_for('admin_dashboard'))
 #-----------------------------------------------------------------------------
 # WebSocket para Atualização em Tempo Real
 #-----------------------------------------------------------------------------
