@@ -13,7 +13,36 @@
             "password": "SENHATESTE",
             "role": "user",
             "carrinho": []
+        },
+        {
+            "id": 3,
+            "username": "teste",
+            "password": "teste",
+            "role": "user",
+            "carrinho": []
         }
     ],
-    "produtos": []
+    "produtos": [
+        {
+            "id": 1,
+            "nome": "teste",
+            "preco": 34213.0,
+            "estoque": 3,
+            "imagem": "/static/img/produtos/camisaflamengo.png"
+        },
+        {
+            "id": 2,
+            "nome": "frieren",
+            "preco": 3223.0,
+            "estoque": 211,
+            "imagem": "/static/img/produtos/frieren.jpg"
+        },
+        {
+            "id": 3,
+            "nome": "violet",
+            "preco": 322.0,
+            "estoque": 32,
+            "imagem": "/static/img/produtos/violetpfp.jpg"
+        }
+    ]
 }

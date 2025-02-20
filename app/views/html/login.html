@@ -16,12 +16,12 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        <form action="/login" method="POST">
+        <form method="POST" action="{{ url_for('login') }}">
             <input type="text" name="username" placeholder="Usuário" required>
             <input type="password" name="password" placeholder="Senha" required>
             <button type="submit">Entrar</button>
         </form>
-        <p>Ainda não tem conta? <a href="/register">Registre-se aqui</a>.</p>
+        <p>Não tem uma conta? <a href="{{ url_for('register') }}">Registre-se</a></p>
     </div>
 </body>
 </html>

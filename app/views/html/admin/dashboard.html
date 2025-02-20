@@ -35,17 +35,17 @@
     <!-- Lista de Produtos (Atualização em Tempo Real via WebSocket) -->
     <div class="wrapper">
         {% for produto in produtos %}
-        <div class="single-card">
+        <div class="single-card" data-product-id="{{ produto.id }}">
             <div class="img-area">
                 <img src="{{produto.imagem}}" alt="{{produto.nome}}">
                 <div class="overlay">
                     <a href="/admin/edit/{{ produto.id }}" class="btn-edit">Editar</a>
-                    <button class="btn-delete", onclick='deleteProduct({{produto.id}})'>Excluir</button>
+                    <button class="btn-delete" onclick='deleteProduct({{produto.id}})'>Excluir</button>
                 </div>
             </div>
             <div class="info">
                 <h3>{{ produto.nome }}</h3>
-                <p class="price">R${{ produto.preco }}</p>
+                <p class="price">R${{ "%.2f"|format(produto.preco) }}</p>
                 <p class="stock">Estoque: {{ produto.estoque }}</p>
             </div>
         </div>

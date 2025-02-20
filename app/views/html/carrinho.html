@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VirtualStore - Meu Carrinho</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/carrinho.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="{{ url_for('landing_page') }}" class="logo-link">
+                <h1>🛒 VirtualStore</h1>
+            </a>
+            <div class="nav-links">
+                <a href="{{ url_for('logout') }}">Sair</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="page-title">Seu Carrinho</div>
+        <div class="content">
+            {% if itens %}
+            <section>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Preço</th>
+                            <th>Quantidade</th>
+                            <th>Total</th>
+                            <th>-</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in itens %}
+                        <tr class="cart-item" data-product-id="{{ item.produto.id }}">
+                            <td>
+                                <div class="product">
+                                    <img src="{{ item.produto.imagem }}" alt="{{ item.produto.nome }}">
+                                    <div class="info">
+                                        <div class="name">{{ item.produto.nome }}</div>
+                                        <div class="category">{{ item.produto.categoria }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>R$ {{ "%.2f"|format(item.produto.preco) }}</td>
+                            <td>
+                                <div class="qty">
+                                    <span>{{ item.quantidade }}</span>
+                                </div>
+                            </td>
+                            <td>R$ {{ "%.2f"|format(item.produto.preco * item.quantidade) }}</td>
+                            <td>
+                                <button class="remove" onclick="removerDoCarrinho({{ item.produto.id|tojson }})">
+                                    <i class="bx bx-x"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+            <aside>
+                <div class="box">
+                    <header>Resumo da compra</header>
+                    <div class="info">
+                        <div><span>Sub-total</span><span>R$ {{ "%.2f"|format(total) }}</span></div>
+                        <div><span>Frete</span><span>Gratuito</span></div>
+                    </div>
+                    <footer>
+                        <span>Total</span>
+                        <span>R$ {{ "%.2f"|format(total) }}</span>
+                    </footer>
+                </div>
+                <button onclick="finalizarCompra()" class="checkout-btn">Finalizar Compra</button>
+            </aside>
+            {% else %}
+                <p class="empty-cart">Seu carrinho está vazio!</p>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 VirtualStore - Projeto Acadêmico</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="/static/js/carrinho.js"></script>
+</body>
+</html> 

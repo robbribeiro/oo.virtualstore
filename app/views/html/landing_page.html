@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-logged-in="{% if 'user_id' in session %}true{% else %}false{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VirtualStore - Produtos</title>
+    <link rel="stylesheet" href="/static/css/landing.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="/static/js/landing.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="{{ url_for('landing_page') }}" class="logo-link">
+                <h1>🛒 VirtualStore</h1>
+            </a>
+            <div class="nav-links">
+                {% if 'user_id' in session %}
+                    <a href="{{ url_for('carrinho') }}">Meu Carrinho</a>
+                    <a href="{{ url_for('logout') }}">Sair</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Entrar</a>
+                    <a href="{{ url_for('register') }}">Cadastrar</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="product-grid">
+            {% for produto in produtos %}
+                <div class="product-card" data-product-id="{{ produto.id }}">
+                    <img src="{{ produto.imagem }}" alt="{{ produto.nome }}">
+                    <h3>{{ produto.nome }}</h3>
+                    <p class="price">R$ {{ "%.2f"|format(produto.preco) }}</p>
+                    <p class="stock">{{ produto.estoque }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 VirtualStore - Projeto Acadêmico</p>
+    </footer>
+</body>
+</html>

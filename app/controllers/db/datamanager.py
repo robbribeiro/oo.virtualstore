@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from app.models.usuario import UsuarioComum, Admin
 from app.models.produto import Produto
+from app.models.carrinho import Carrinho
 
 class DataManager:
     def __init__(self):
@@ -21,7 +22,7 @@ class DataManager:
                         usuario = Admin(user_data["id"], user_data["username"], user_data["password"])
                     else:
                         usuario = UsuarioComum(user_data["id"], user_data["username"], user_data["password"])
-                    usuario.carrinho = user_data["carrinho"]
+                    usuario.carrinho = Carrinho.from_dict(user_data["carrinho"])
                     self.usuarios.append(usuario)
                 # Carregar produtos
                 for produto_data in data["produtos"]:
@@ -42,7 +43,7 @@ class DataManager:
                     "username": user.username,
                     "password": user.password,
                     "role": user.role,
-                    "carrinho": user.carrinho
+                    "carrinho": user.carrinho.to_dict()
                 } for user in self.usuarios
             ],
             "produtos": [

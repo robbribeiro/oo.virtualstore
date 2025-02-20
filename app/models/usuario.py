@@ -1,10 +1,12 @@
+from app.models.carrinho import Carrinho
+
 class Usuario:
     def __init__(self, id, username, password, role):
         self.id = id
         self.username = username
         self.password = password
         self.role = role
-        self.carrinho = []
+        self.carrinho = Carrinho()
 
 class UsuarioComum(Usuario):
     def __init__(self, id, username, password):

@@ -1,13 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from flask_socketio import SocketIO, emit
 import os
 from app.controllers.application import Application
 from app.controllers.db.datamanager import DataManager
-from app.models.usuario import UsuarioComum
+from app.models.usuario import UsuarioComum, Admin
 from app.models.produto import Produto
 
 app = Flask(__name__, template_folder='app/views/html', static_folder='app/static')
-app.secret_key = 'sua_chave_secreta_ultra_segura'  # Troque em produção!
+app.secret_key = 'sua_chave_secreta'  # Substitua por uma chave secreta segura
 
 # Inicializa o banco de dados e a aplicação
 db_manager = DataManager()
@@ -72,8 +72,7 @@ def logout():
     return redirect(url_for('login'))
 
 #-----------------------------------------------------------------------------
-# Rota da Página Inicial (Após Login)
-
+# Rotas da Página Inicial
 #-----------------------------------------------------------------------------
 
 @app.route('/')
@@ -81,12 +80,122 @@ def landing_page():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    produtos = db_manager.produtos  # Lista de produtos do banco de dados
+    produtos = [p for p in db_manager.produtos if p.estoque > 0]
     return render_template('landing_page.html', produtos=produtos)
 
 #-----------------------------------------------------------------------------
-# Rotas do Admin (Acesso restrito)
+# Rotas do Carrinho
 #-----------------------------------------------------------------------------
+
+@app.route('/add_to_cart/<int:product_id>', methods=['POST'])
+def add_to_cart(product_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    user = next((u for u in db_manager.usuarios if u.id == session['user_id']), None)
+    produto = next((p for p in db_manager.produtos if p.id == product_id), None)
+
+    if user and produto and produto.estoque > 0:
+        user.carrinho.adicionar_item(product_id)
+        produto.estoque -= 1
+        db_manager.salvar_dados()
+        
+        # Emite atualização do estoque via WebSocket
+        socketio.emit('estoque_atualizado', {
+            'produto_id': product_id,
+            'estoque': produto.estoque
+        })
+        
+        return '', 200
+    return '', 400
+
+@app.route('/remove_from_cart/<int:product_id>', methods=['POST'])
+def remove_from_cart(product_id):
+    if 'user_id' not in session:
+        return '', 401
+    
+    user = next((u for u in db_manager.usuarios if u.id == session['user_id']), None)
+    if not user:
+        return '', 401
+    
+    # Obtém a quantidade que foi removida
+    quantidade_removida = user.carrinho.remover_item(product_id)
+    
+    # Devolve os itens ao estoque
+    produto = next((p for p in db_manager.produtos if p.id == product_id), None)
+    if produto:
+        produto.estoque += quantidade_removida
+        
+        # Emite atualização do estoque via WebSocket
+        socketio.emit('estoque_atualizado', {
+            'produto_id': product_id,
+            'estoque': produto.estoque
+        })
+    
+    db_manager.salvar_dados()
+    return '', 200
+
+@app.route('/carrinho')
+def carrinho():
+    if 'user_id' not in session:
+        flash('Por favor, faça login para acessar seu carrinho', 'info')
+        return redirect(url_for('login'))
+    
+    user = next((u for u in db_manager.usuarios if u.id == session['user_id']), None)
+    if not user:
+        flash('Usuário não encontrado', 'error')
+        return redirect(url_for('login'))
+    
+    # Prepara os itens do carrinho com informações completas dos produtos
+    itens_carrinho = []
+    total = 0
+    
+    for item in user.carrinho.itens:
+        produto = next((p for p in db_manager.produtos if p.id == item['produto_id']), None)
+        if produto:
+            itens_carrinho.append({
+                'produto': produto,
+                'quantidade': item['quantidade']
+            })
+            total += produto.preco * item['quantidade']
+    
+    return render_template('carrinho.html', itens=itens_carrinho, total=total)
+
+@app.route('/get_cart_total')
+def get_cart_total():
+    if 'user_id' not in session:
+        return jsonify({'total': 0})
+    
+    user = next((u for u in db_manager.usuarios if u.id == session['user_id']), None)
+    if not user:
+        return jsonify({'total': 0})
+    
+    total = 0
+    for item in user.carrinho.itens:
+        produto = next((p for p in db_manager.produtos if p.id == item['produto_id']), None)
+        if produto:
+            total += produto.preco * item['quantidade']
+    
+    return jsonify({'total': total})
+
+@app.route('/finalizar_compra', methods=['POST'])
+def finalizar_compra():
+    if 'user_id' not in session:
+        return '', 401
+    
+    user = next((u for u in db_manager.usuarios if u.id == session['user_id']), None)
+    if not user:
+        return '', 401
+    
+    user.carrinho.limpar()
+    db_manager.salvar_dados()
+    
+    return '', 200
+
+#-----------------------------------------------------------------------------
+# Rotas do Admin
+#-----------------------------------------------------------------------------
+
 @app.route('/admin/dashboard')
 def admin_dashboard():
     if 'role' not in session or session['role'] != 'admin':
@@ -124,9 +233,17 @@ def add_product():
     db_manager.produtos.append(novo_produto)
     db_manager.salvar_dados()
     
+    # Emite evento de novo produto via WebSocket
+    socketio.emit('produto_adicionado', {
+        'produto_id': novo_produto.id,
+        'nome': novo_produto.nome,
+        'preco': novo_produto.preco,
+        'estoque': novo_produto.estoque,
+        'imagem': novo_produto.imagem
+    })
+    
     return {'success': True}
 
-# Rota para editar produto (formulário)
 @app.route('/admin/edit/<int:product_id>')
 def edit_product_form(product_id):
     if session.get('role') != 'admin':
@@ -138,7 +255,6 @@ def edit_product_form(product_id):
     
     return render_template('/admin/edit_product.html', produto=produto)
 
-# Rota para processar a edição do produto
 @app.route('/admin/edit/<int:product_id>', methods=['POST'])
 def edit_product(product_id):
     if session.get('role') != 'admin':
@@ -156,7 +272,6 @@ def edit_product(product_id):
     # Atualizar imagem se uma nova for enviada
     if 'imagem' in request.files:
         file = request.files['imagem']
-        print(f"[DEBUG] Novo arquivo de imagem recebido: {file.filename}")
         if file.filename != '' and allowed_file(file.filename):
             # Remove a imagem antiga
             if produto.imagem:
@@ -171,20 +286,48 @@ def edit_product(product_id):
             produto.imagem = f"/static/img/produtos/{filename}"
     
     db_manager.salvar_dados()
+    
+    # Emite evento de produto atualizado via WebSocket
+    socketio.emit('produto_atualizado', {
+        'produto_id': produto.id,
+        'nome': produto.nome,
+        'preco': produto.preco,
+        'estoque': produto.estoque,
+        'imagem': produto.imagem
+    })
+    
     return redirect(url_for('admin_dashboard'))
 
-
-#Rota para remoção de produto
 @app.route('/admin/delete_product/<int:product_id>', methods=['POST'])
 def delete_product(product_id):
-    if session.get('role') != 'admin':
-        return redirect(url_for('login'))
-    
-    # Debug: Log do ID recebido
-    print(f"[DEBUG] Tentando excluir produto ID: {product_id}")
-    
-    db_manager.remover_produto(product_id)
-    return redirect(url_for('admin_dashboard'))
+    try:
+        print(f"Tentando deletar produto {product_id}")
+        
+        if 'user_id' not in session:
+            return jsonify({'success': False, 'message': 'Não autorizado'}), 401
+        
+        user = next((u for u in db_manager.usuarios if u.id == session['user_id']), None)
+        
+        if not user or not isinstance(user, Admin):
+            return jsonify({'success': False, 'message': 'Não autorizado'}), 401
+        
+        produto = next((p for p in db_manager.produtos if p.id == product_id), None)
+        if produto:
+            db_manager.produtos = [p for p in db_manager.produtos if p.id != product_id]
+            db_manager.salvar_dados()
+            
+            socketio.emit('produto_removido', {
+                'produto_id': product_id
+            })
+            
+            return jsonify({'success': True}), 200
+            
+        return jsonify({'success': False, 'message': 'Produto não encontrado'}), 404
+        
+    except Exception as e:
+        print(f"Erro ao deletar produto: {str(e)}")
+        return jsonify({'success': False, 'message': f'Erro ao deletar produto: {str(e)}'}), 500
+
 #-----------------------------------------------------------------------------
 # WebSocket para Atualização em Tempo Real
 #-----------------------------------------------------------------------------
@@ -206,5 +349,5 @@ def handle_estoque_update(data):
         }, broadcast=True)
         
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    socketio.run(app, host='0.0.0.0', port=8080, debug=True)
     
