@@ -5,7 +5,6 @@ from app.controllers.application import Application
 from app.controllers.db.datamanager import DataManager
 from app.models.usuario import UsuarioComum, Admin
 from app.models.produto import Produto
-from app.routes import app, socketio
 
 app = Flask(__name__, template_folder='app/views/html', static_folder='app/static')
 app.secret_key = 'sua_chave_secreta'  # Substitua por uma chave secreta segura
