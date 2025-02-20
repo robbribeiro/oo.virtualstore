@@ -33,15 +33,16 @@ header {
     background: #111;
     color: white;
     padding: 20px 0;
+    width: 100%;
 }
 
 nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+    width: 100%;
+    padding: 0 40px;
+    box-sizing: border-box;
 }
 
 .logo-link {
@@ -49,6 +50,9 @@ nav {
     padding: 8px 16px;
     border-radius: 4px;
     transition: background 0.3s;
+    margin-right: auto;
+    position: relative;
+    left: 0;
 }
 
 .logo-link:hover {
@@ -63,6 +67,9 @@ nav {
 .nav-links {
     display: flex;
     gap: 20px;
+    margin-left: auto;
+    position: relative;
+    right: 0;
 }
 
 .nav-links a {
@@ -75,6 +82,10 @@ nav {
 
 .nav-links a:hover {
     background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-links a:last-child {
+    margin-left: auto;
 }
 
 /* Grade de Produtos */
@@ -167,12 +178,11 @@ footer {
 /* Responsividade */
 @media (max-width: 768px) {
     nav {
-        flex-direction: column;
-        gap: 15px;
+        padding: 0 20px;
     }
 
     .nav-links {
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
     }
 
