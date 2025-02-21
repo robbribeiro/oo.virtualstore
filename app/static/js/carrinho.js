@@ -52,14 +52,19 @@ function removerDoCarrinho(productId) {
 }
 
 function atualizarTotal() {
-    fetch('/get_cart_total')
-        .then(response => response.json())
-        .then(data => {
-            const totalElement = document.querySelector('.cart-summary h3');
-            if (totalElement) {
-                totalElement.textContent = `Total: R$ ${data.total.toFixed(2)}`;
-            }
-        });
+    const items = document.querySelectorAll('.cart-item');
+    let total = 0;
+
+    items.forEach(item => {
+        const price = parseFloat(item.querySelector('td:nth-child(2)').textContent.replace('R$', '').trim());
+        const quantity = parseInt(item.querySelector('.qty span').textContent);
+        total += price * quantity;
+    });
+
+    const totalElement = document.querySelector('.cart-summary h3');
+    if (totalElement) {
+        totalElement.textContent = `Total: R$ ${total.toFixed(2)}`;
+    }
 }
 
 function finalizarCompra() {

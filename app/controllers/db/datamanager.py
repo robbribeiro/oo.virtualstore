@@ -63,29 +63,16 @@ class DataManager:
         produto = next((p for p in self.produtos if p.id == product_id), None)
     
         if produto:
-            print(f"[DEBUG] Produto encontrado: {produto.nome} (ID: {produto.id})")
-        
             # Remover imagem
             if produto.imagem:
-                # Ajusta o caminho para ser relativo à raiz do projeto
                 caminho_imagem = os.path.join('app/static/img/produtos', os.path.basename(produto.imagem))
-                print(f"[DEBUG] Tentando remover imagem: {caminho_imagem}")
-                try:
-                    if os.path.exists(caminho_imagem):
-                        os.remove(caminho_imagem)
-                        print(f"[DEBUG] Imagem removida com sucesso: {caminho_imagem}")
-                    else:
-                        print(f"[DEBUG] Arquivo não encontrado: {caminho_imagem}")
-                except Exception as e:
-                    print(f"[ERRO] Falha ao remover imagem: {str(e)}")
-        
+                if os.path.exists(caminho_imagem):
+                    os.remove(caminho_imagem)
             # Remover do banco de dados
             self.produtos = [p for p in self.produtos if p.id != product_id]
             self.salvar_dados()
-            print("[DEBUG] Produto removido do banco de dados")
             return True
         
-        print(f"[ERRO] Produto com ID {product_id} não encontrado")
         return False
 
     # Métodos para manipulação de dados:

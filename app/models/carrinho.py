@@ -3,7 +3,6 @@ class Carrinho:
         self.itens = []
 
     def adicionar_item(self, produto_id, quantidade=1):
-        """Adiciona um item ao carrinho ou incrementa sua quantidade se já existir"""
         # Procura se o produto já existe no carrinho
         item_existente = next((item for item in self.itens if item['produto_id'] == produto_id), None)
         
