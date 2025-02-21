@@ -1,5 +1,5 @@
 body {
-	background: #414852;
+	background: white;
 	font-family: 'Montserrat', sans-serif;
 }
 
@@ -8,9 +8,16 @@ body {
     margin: 2rem auto;
     padding: 1rem;
 }
+.admin-container h1 {
+    text-align: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: #000;
+    margin-bottom: 1rem;
+}
 
 .card {
-    background: #414852; 
+    background: #111; 
     border-radius: 15px;
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
     padding: 1.5rem;
@@ -22,7 +29,7 @@ body {
     text-align: center;
     font-family: 'Bebas Neue', sans-serif;
     font-size: 24px;
-    color: #000;
+    color: #ddd;
     margin-bottom: 1rem;
 }
 .card form {
@@ -42,7 +49,7 @@ body {
     color: #ddd;
 }
 .card button {
-    background-color: aqua;
+    background-color: #eee;
     color: #333;
     font-weight: bold;
     cursor: pointer;
@@ -60,7 +67,7 @@ body {
 }
 
 .custom-file-upload {
-    background-color: aqua;
+    background-color: #eee;
     color: #333;
     padding: 10px 15px;
     border-radius: 5px;
@@ -116,7 +123,7 @@ input[type="file"] {
 	box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
 	transition: box-shadow 0.3s ease;
 	overflow: hidden;
-	background: #414852;
+	background: #111;
 	border-radius: 15px;
 	transition: all 0.8s ease-in-out;
 }
@@ -148,7 +155,7 @@ input[type="file"] {
 	align-items: center;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(0, 174, 255, 0.8);
+	background-color: rgba(51, 51, 51, 0.9);
 	opacity: 0;
 	transition: opacity 0.3s ease;
 }
@@ -190,5 +197,25 @@ input[type="file"] {
 	margin: 0;
 	font-size: 30px;
 	font-weight: bold;
-	color: aqua;
+	color: #ddd;
+}
+
+.back-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    background-color: #ddd;
+    color: #333;
+    text-decoration: none;
+    border-radius: 5px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.back-button:hover {
+    background-color: orangered;
+    color: white;
 }

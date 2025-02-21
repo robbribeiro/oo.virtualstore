@@ -56,7 +56,6 @@ def login():
             session['user_id'] = user.id
             session['role'] = user.role
             session['username'] = user.username  # Adiciona o username à sessão
-            flash('Login realizado com sucesso!', 'success')
             if user.role == 'admin':
                 return redirect(url_for('admin_dashboard'))
             else:
@@ -71,7 +70,6 @@ def logout():
     # Pega a URL anterior
     previous_url = request.referrer
     session.clear()
-    flash('Você foi desconectado.', 'info')
     
     # Se veio da página do carrinho, redireciona de volta para ela
     if previous_url and 'carrinho' in previous_url:

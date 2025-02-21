@@ -363,3 +363,17 @@ footer {
     display: flex;
     /* ... resto dos estilos ... */
 }
+
+.admin-link {
+    background: #ddd;
+    color: #333 !important;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.admin-link:hover {
+    background-color: orangered !important;
+    color: white !important;
+}

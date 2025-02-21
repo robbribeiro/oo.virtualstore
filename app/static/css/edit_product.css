@@ -1,6 +1,6 @@
 body {
     font-family: 'Montserrat', sans-serif;
-    background-color: #414852;
+    background-color: white;
 }
 
 .admin-container {
@@ -18,13 +18,17 @@ body {
 }
 
 .card {
-    background: #414852;
+    background: #111;
     border-radius: 15px;
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5); 
     padding: 1.5rem;
     margin-bottom: 1.5rem;
     color: #ddd;
     font-family: 'Montserrat', sans-serif;
+}
+
+.card h2 {
+   color: #ddd;
 }
 
 .card form {
@@ -44,7 +48,7 @@ body {
     color: #ddd;
 }
 .card button, .btn-cancel {
-    background-color: aqua;
+    background-color: #ddd;
     color: #333;
     font-weight: bold;
     cursor: pointer;
@@ -67,7 +71,7 @@ body {
 }
 
 .custom-file-upload {
-    background-color: aqua;
+    background-color: #ddd;
     color: #333;
     padding: 10px 15px;
     border-radius: 5px;

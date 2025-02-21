@@ -13,7 +13,7 @@
         <div class="card">
             <h2>Editar Produto</h2>
             <form method="POST" enctype="multipart/form-data">
-                <input type="text" name="nome" placeholder="Nome do Produto" value="{{ produto.nome }}" required>
+                <input type="text" name="nome" placeholder="Nome" value="{{ produto.nome }}" required>
                 <input type="number" name="preco" step="0.01" placeholder="Preço" value="{{ produto.preco }}" required>
                 <input type="number" name="estoque" placeholder="Estoque" value="{{ produto.estoque }}" required>
                 <div class="file-upload-container">

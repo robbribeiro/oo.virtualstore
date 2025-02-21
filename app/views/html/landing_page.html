@@ -17,6 +17,9 @@
             </a>
             <div class="nav-links">
                 {% if 'user_id' in session %}
+                    {% if session.get('role') == 'admin' %}
+                        <a href="{{ url_for('admin_dashboard') }}" class="admin-link">Dashboard Admin</a>
+                    {% endif %}
                     <div class="account-dropdown">
                         <button class="account-btn">Minha Conta</button>
                         <div class="dropdown-content">
