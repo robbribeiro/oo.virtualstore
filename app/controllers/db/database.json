@@ -20,6 +20,27 @@
             "password": "teste",
             "role": "user",
             "carrinho": []
+        },
+        {
+            "id": 1,
+            "username": "testuser",
+            "password": "testpass",
+            "role": "user",
+            "carrinho": []
+        },
+        {
+            "id": 1,
+            "username": "testuser",
+            "password": "testpass",
+            "role": "user",
+            "carrinho": []
+        },
+        {
+            "id": 1,
+            "username": "testuser",
+            "password": "testpass",
+            "role": "user",
+            "carrinho": []
         }
     ],
     "produtos": []
