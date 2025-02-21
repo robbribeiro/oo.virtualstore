@@ -102,7 +102,16 @@ socket.on('produto_adicionado', (data) => {
 
 // Atualização quando um produto é editado
 socket.on('produto_atualizado', (data) => {
-    const productCard = document.querySelector(`.product-card[data-product-id="${data.produto_id}"]`);
+    let productCard = document.querySelector(`.product-card[data-product-id="${data.produto_id}"]`);
+    
+    // Se o produto não existe no DOM e tem estoque, cria um novo card
+    if (!productCard && data.estoque > 0) {
+        const productGrid = document.querySelector('.product-grid');
+        productGrid.appendChild(createProductCard(data));
+        return;
+    }
+    
+    // Se existe o card
     if (productCard) {
         // Se o estoque for 0, remove o card
         if (data.estoque <= 0) {
@@ -110,27 +119,89 @@ socket.on('produto_atualizado', (data) => {
             return;
         }
         
+        // Atualiza as informações do card existente
         productCard.querySelector('img').src = data.imagem;
         productCard.querySelector('h3').textContent = data.nome;
         productCard.querySelector('.price').textContent = `R$ ${Number(data.preco).toFixed(2)}`;
         productCard.querySelector('.stock').textContent = `${data.estoque} em estoque`;
         
         const button = productCard.querySelector('button');
-        button.disabled = data.estoque <= 0;
-        button.textContent = data.estoque <= 0 ? 'Sem Estoque' : 'Adicionar';
+        if (button) {
+            button.disabled = data.estoque <= 0;
+            button.textContent = data.estoque <= 0 ? 'Sem Estoque' : 'Adicionar';
+        }
     }
 });
 
+// Função para atualizar o contador do carrinho
+function updateCartCounter() {
+    const counter = document.querySelector('.cart-counter');
+    if (!counter) return;
+
+    // Pegar o valor atual e incrementar
+    let currentCount = parseInt(counter.textContent || '0');
+    currentCount++;
+
+    // Atualizar o contador
+    counter.textContent = currentCount;
+    counter.style.display = currentCount > 0 ? 'flex' : 'none';
+}
+
 function addToCart(productId) {
     if (!isLoggedIn) {
-        window.location.href = "/login";
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.textContent = 'Por favor, faça login ou crie uma conta para adicionar produtos ao carrinho';
+        document.body.appendChild(feedback);
+
+        setTimeout(() => {
+            feedback.remove();
+        }, 3000);
         return;
     }
 
     fetch(`/add_to_cart/${productId}`, { method: 'POST' })
         .then(response => {
-            if (!response.ok) {
+            if (response.ok) {
+                updateCartCounter();
+            } else {
                 console.error("Erro ao adicionar ao carrinho");
             }
+        });
+}
+
+// Inicializar o contador do carrinho quando a página carregar
+document.addEventListener('DOMContentLoaded', () => {
+    // ... existing DOMContentLoaded code ...
+
+    // Inicializar o contador do carrinho
+    const counter = document.querySelector('.cart-counter');
+    if (counter) {
+        fetch('/get_cart_count')
+            .then(response => response.json())
+            .then(data => {
+                counter.textContent = data.count;
+                counter.style.display = data.count > 0 ? 'flex' : 'none';
+            });
+    }
+
+    // Adiciona handler para o link de logout
+    const logoutLink = document.querySelector('a[href="/logout"]');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', handleLogout);
+    }
+});
+
+// Adicione esta função no início do arquivo, junto com as outras funções
+function handleLogout(event) {
+    event.preventDefault();
+    const logoutUrl = event.currentTarget.href;
+    
+    fetch(logoutUrl)
+        .then(() => {
+            window.location.reload();  // Recarrega a página após o logout
+        })
+        .catch(error => {
+            console.error('Erro ao fazer logout:', error);
         });
 }

@@ -17,8 +17,17 @@
             </a>
             <div class="nav-links">
                 {% if 'user_id' in session %}
-                    <a href="{{ url_for('carrinho') }}">Meu Carrinho</a>
-                    <a href="{{ url_for('logout') }}">Sair</a>
+                    <div class="account-dropdown">
+                        <button class="account-btn">Minha Conta</button>
+                        <div class="dropdown-content">
+                            <p class="user-name">{{ session.get('username', 'Usuário') }}</p>
+                            <a href="{{ url_for('logout') }}" class="logout-link">Sair</a>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('carrinho') }}" class="cart-link">
+                        Meu Carrinho
+                        <span class="cart-counter {% if cart_count > 0 %}visible{% endif %}">{{ cart_count }}</span>
+                    </a>
                 {% else %}
                     <a href="{{ url_for('login') }}">Entrar</a>
                     <a href="{{ url_for('register') }}">Cadastrar</a>
@@ -30,11 +39,14 @@
     <main>
         <div class="product-grid">
             {% for produto in produtos %}
-                <div class="product-card" data-product-id="{{ produto.id }}">
+                <div class="product-card" data-product-id="{{ produto.id }}" data-estoque="{{ produto.estoque }}">
                     <img src="{{ produto.imagem }}" alt="{{ produto.nome }}">
                     <h3>{{ produto.nome }}</h3>
                     <p class="price">R$ {{ "%.2f"|format(produto.preco) }}</p>
-                    <p class="stock">{{ produto.estoque }}</p>
+                    <p class="stock">{{ produto.estoque }} em estoque</p>
+                    <button class="add-to-cart" onclick="addToCart('{{ produto.id }}')" {% if produto.estoque <= 0 %}disabled{% endif %}>
+                        {% if produto.estoque <= 0 %}Sem Estoque{% else %}Adicionar{% endif %}
+                    </button>
                 </div>
             {% endfor %}
         </div>

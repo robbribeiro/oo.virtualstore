@@ -55,6 +55,7 @@ def login():
         if user and user.password == password:
             session['user_id'] = user.id
             session['role'] = user.role
+            session['username'] = user.username  # Adiciona o username à sessão
             flash('Login realizado com sucesso!', 'success')
             if user.role == 'admin':
                 return redirect(url_for('admin_dashboard'))
@@ -67,21 +68,33 @@ def login():
 
 @app.route('/logout')
 def logout():
+    # Pega a URL anterior
+    previous_url = request.referrer
     session.clear()
     flash('Você foi desconectado.', 'info')
-    return redirect(url_for('login'))
+    
+    # Se veio da página do carrinho, redireciona de volta para ela
+    if previous_url and 'carrinho' in previous_url:
+        return redirect(url_for('carrinho'))
+    
+    # Caso contrário, vai para a página inicial
+    return redirect(url_for('landing_page'))
 
 #-----------------------------------------------------------------------------
 # Rotas da Página Inicial
 #-----------------------------------------------------------------------------
 
 @app.route('/')
-def landing_page():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
+def landing_page():    
+    produtos = db_manager.produtos
+    cart_count = 0
     
-    produtos = [p for p in db_manager.produtos if p.estoque > 0]
-    return render_template('landing_page.html', produtos=produtos)
+    if 'user_id' in session:
+        user = next((u for u in db_manager.usuarios if u.id == session['user_id']), None)
+        if user:
+            cart_count = sum(item['quantidade'] for item in user.carrinho.itens)
+    
+    return render_template('landing_page.html', produtos=produtos, cart_count=cart_count)
 
 #-----------------------------------------------------------------------------
 # Rotas do Carrinho
@@ -138,13 +151,11 @@ def remove_from_cart(product_id):
 @app.route('/carrinho')
 def carrinho():
     if 'user_id' not in session:
-        flash('Por favor, faça login para acessar seu carrinho', 'info')
-        return redirect(url_for('login'))
+        return render_template('carrinho.html', itens=None, total=0, cart_count=0)
     
     user = next((u for u in db_manager.usuarios if u.id == session['user_id']), None)
     if not user:
-        flash('Usuário não encontrado', 'error')
-        return redirect(url_for('login'))
+        return render_template('carrinho.html', itens=None, total=0, cart_count=0)
     
     # Prepara os itens do carrinho com informações completas dos produtos
     itens_carrinho = []
@@ -264,6 +275,9 @@ def edit_product(product_id):
     if not produto:
         return redirect(url_for('admin_dashboard'))
     
+    # Pega o estoque antigo para comparação
+    estoque_antigo = produto.estoque
+    
     # Atualizar dados básicos
     produto.nome = request.form['nome']
     produto.preco = float(request.form['preco'])
@@ -293,7 +307,8 @@ def edit_product(product_id):
         'nome': produto.nome,
         'preco': produto.preco,
         'estoque': produto.estoque,
-        'imagem': produto.imagem
+        'imagem': produto.imagem,
+        'estoque_alterado': estoque_antigo == 0 and produto.estoque > 0  # Indica se o produto voltou a ter estoque
     })
     
     return redirect(url_for('admin_dashboard'))
@@ -301,7 +316,7 @@ def edit_product(product_id):
 @app.route('/admin/delete_product/<int:product_id>', methods=['POST'])
 def delete_product(product_id):
     try:
-        print(f"Tentando deletar produto {product_id}")
+        print(f"[DEBUG] Tentando deletar produto {product_id}")
         
         if 'user_id' not in session:
             return jsonify({'success': False, 'message': 'Não autorizado'}), 401
@@ -311,21 +326,17 @@ def delete_product(product_id):
         if not user or not isinstance(user, Admin):
             return jsonify({'success': False, 'message': 'Não autorizado'}), 401
         
-        produto = next((p for p in db_manager.produtos if p.id == product_id), None)
-        if produto:
-            db_manager.produtos = [p for p in db_manager.produtos if p.id != product_id]
-            db_manager.salvar_dados()
-            
+        # Usar o método remover_produto do DataManager
+        if db_manager.remover_produto(product_id):
             socketio.emit('produto_removido', {
                 'produto_id': product_id
             })
-            
             return jsonify({'success': True}), 200
-            
+        
         return jsonify({'success': False, 'message': 'Produto não encontrado'}), 404
         
     except Exception as e:
-        print(f"Erro ao deletar produto: {str(e)}")
+        print(f"[ERRO] Erro ao deletar produto: {str(e)}")
         return jsonify({'success': False, 'message': f'Erro ao deletar produto: {str(e)}'}), 500
 
 #-----------------------------------------------------------------------------

@@ -73,3 +73,24 @@ function finalizarCompra() {
             }
         });
 }
+
+function handleLogout(event) {
+    event.preventDefault();
+    const logoutUrl = event.currentTarget.href;
+    
+    fetch(logoutUrl)
+        .then(() => {
+            window.location.reload();  // Recarrega a página após o logout
+        })
+        .catch(error => {
+            console.error('Erro ao fazer logout:', error);
+        });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Adiciona handler para o link de logout
+    const logoutLink = document.querySelector('a[href="/logout"]');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', handleLogout);
+    }
+});

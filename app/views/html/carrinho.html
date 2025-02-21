@@ -15,7 +15,18 @@
                 <h1>🛒 VirtualStore</h1>
             </a>
             <div class="nav-links">
-                <a href="{{ url_for('logout') }}">Sair</a>
+                {% if 'user_id' in session %}
+                    <div class="account-dropdown">
+                        <button class="account-btn">Minha Conta</button>
+                        <div class="dropdown-content">
+                            <p class="user-name">{{ session.get('username', 'Usuário') }}</p>
+                            <a href="{{ url_for('logout') }}" class="logout-link">Sair</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Entrar</a>
+                    <a href="{{ url_for('register') }}">Cadastrar</a>
+                {% endif %}
             </div>
         </nav>
     </header>
@@ -23,7 +34,9 @@
     <main>
         <div class="page-title">Seu Carrinho</div>
         <div class="content">
-            {% if itens %}
+            {% if 'user_id' not in session %}
+                <p class="empty-cart">Faça login para ver seu carrinho!</p>
+            {% elif itens %}
             <section>
                 <table>
                     <thead>
