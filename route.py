@@ -9,9 +9,9 @@ from app.models.produto import Produto
 app = Flask(__name__, template_folder='app/views/html', static_folder='app/static')
 app.secret_key = 'sua_chave_secreta'  # Substitua por uma chave secreta segura
 
-# Inicializa o banco de dados e a aplicação
+# Inicializa o banco de dados
 db_manager = DataManager()
-ctl = Application()
+
 
 # Inicializa o SocketIO com o app Flask
 socketio = SocketIO(app)
